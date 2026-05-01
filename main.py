@@ -20,16 +20,6 @@ def toggle_sound():
        sound_button.config(text="🔇")
        pygame.mixer.music.stop()
 
-
-def play_sound():
-   if sound_on:
-       try:
-           pygame.mixer.music.load("click.mp3")
-           pygame.mixer.music.play()
-       except:
-           print("Missing sound file")
-
-
 # --- MAIN WINDOW ---
 root = tk.Tk()
 root.title("New Zealand Quiz")
