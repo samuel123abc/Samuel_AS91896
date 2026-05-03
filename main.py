@@ -3,7 +3,7 @@ from tkinter import Canvas
 import pygame
 
 
-# --- INIT SOUND ---
+# Sound
 pygame.mixer.init()
 sound_on = True
 
@@ -20,26 +20,25 @@ def toggle_sound():
        sound_button.config(text="🔇")
        pygame.mixer.music.stop()
 
-# --- MAIN WINDOW ---
+# Main Menu
 root = tk.Tk()
 root.title("New Zealand Quiz")
 root.geometry("1000x600")
 root.resizable(False, False)
 
 
-# --- COLORS ---
+# Program Colours
 NAVY = "#0b0f5c"
 RED = "#e21b23"
 WHITE = "#ffffff"
 GREY = "#d9d9d9"
 
 
-# --- CANVAS ---
 canvas = Canvas(root, width=1000, height=600, bg=NAVY, highlightthickness=0)
 canvas.pack(fill="both", expand=True)
 
 
-# --- DIAGONAL STRIPES (NARROW BAND) ---
+# Diagonal Stripe Design
 canvas.create_polygon(
    450, 600,
    1000, 300,
@@ -60,11 +59,10 @@ canvas.create_polygon(
 )
 
 
-# --- LEFT MARGIN ---
 LEFT_MARGIN = 80
 
 
-# --- HEADER (LEFT ALIGNED) ---
+# Header
 canvas.create_text(
    LEFT_MARGIN, 70,
    text="Welcome to the New Zealand Quiz",
@@ -83,7 +81,7 @@ canvas.create_text(
 )
 
 
-# --- MENU BUTTON CREATOR ---
+# Main Menu Button
 def create_menu_button(text, y):
    label = tk.Label(
        root,
@@ -111,14 +109,13 @@ def create_menu_button(text, y):
    canvas.create_window(200, y, window=label)
 
 
-# --- MENU BUTTONS ---
+# Menu Button
 create_menu_button("General Knowledge", 220)
 create_menu_button("Native Animals", 270)
 create_menu_button("Places", 320)
 create_menu_button("Slang", 370)
 
 
-# --- ICON BUTTON CREATOR ---
 def create_icon_button(symbol, command):
    btn = tk.Button(
        root,
@@ -137,17 +134,17 @@ def create_icon_button(symbol, command):
    return btn
 
 
-# --- HELP FUNCTION ---
+# Help
 def show_help():
    print("Help clicked")
 
 
-# --- CREATE ICON BUTTONS ---
+# Icon Buttons (Help and Sound)
 help_button = create_icon_button("?", show_help)
 sound_button = create_icon_button("🔊", toggle_sound)
 
 
-# --- POSITION ICON BUTTONS (BOTTOM RIGHT CORNER) ---
+# Icon Button Position
 RIGHT_MARGIN = 40
 BOTTOM_MARGIN = 40
 SPACING = 60
@@ -167,6 +164,5 @@ canvas.create_window(
 )
 
 
-# --- RUN ---
 root.mainloop()
 
