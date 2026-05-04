@@ -3,7 +3,7 @@ from tkinter import Canvas
 import pygame
 
 
-# Sound
+# Sound for my Quiz
 pygame.mixer.init()
 sound_on = True
 
@@ -20,14 +20,14 @@ def toggle_sound():
        sound_button.config(text="🔇")
        pygame.mixer.music.stop()
 
-# Main Menu
+# Main Menu header and geometry
 root = tk.Tk()
 root.title("New Zealand Quiz")
 root.geometry("1000x600")
 root.resizable(False, False)
 
 
-# Program Colours
+# Colours are used in my design
 NAVY = "#0b0f5c"
 RED = "#e21b23"
 WHITE = "#ffffff"
@@ -38,7 +38,7 @@ canvas = Canvas(root, width=1000, height=600, bg=NAVY, highlightthickness=0)
 canvas.pack(fill="both", expand=True)
 
 
-# Diagonal Stripe Design
+# Diagonal stripe on home page
 canvas.create_polygon(
    450, 600,
    1000, 300,
@@ -62,7 +62,7 @@ canvas.create_polygon(
 LEFT_MARGIN = 80
 
 
-# Header
+# Header of my home screen
 canvas.create_text(
    LEFT_MARGIN, 70,
    text="Welcome to the New Zealand Quiz",
@@ -81,7 +81,7 @@ canvas.create_text(
 )
 
 
-# Main Menu Button
+# Buttons of my main menu
 def create_menu_button(text, y):
    label = tk.Label(
        root,
@@ -109,7 +109,7 @@ def create_menu_button(text, y):
    canvas.create_window(200, y, window=label)
 
 
-# Menu Button
+# Buttons on my main menu
 create_menu_button("General Knowledge", 220)
 create_menu_button("Native Animals", 270)
 create_menu_button("Places", 320)
@@ -134,17 +134,17 @@ def create_icon_button(symbol, command):
    return btn
 
 
-# Help
+# Help button on home page
 def show_help():
    print("Help clicked")
 
 
-# Icon Buttons (Help and Sound)
+# Main menu icon buttons (sound and help button)
 help_button = create_icon_button("?", show_help)
 sound_button = create_icon_button("🔊", toggle_sound)
 
 
-# Icon Button Position
+# The position of my main menu buttons
 RIGHT_MARGIN = 40
 BOTTOM_MARGIN = 40
 SPACING = 60
