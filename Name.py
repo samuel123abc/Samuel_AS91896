@@ -93,6 +93,12 @@ def create_icon_button(symbol, command):
    )
    return btn
 
+tk.Label(root, text="Enter Name Here").grid(row=0, column=0)
+
+entry1 = tk.Entry(root)
+
+entry1.grid(row=0, column=1)
+
 # Help button on home page
 def show_help():
    print("Help clicked")
