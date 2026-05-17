@@ -1,33 +1,26 @@
 import tkinter as tk
-from PIL import Image, ImageTk
 from tkinter import Canvas
 import pygame
 
 
-# --- INIT SOUND ---
 pygame.mixer.init()
 sound_on = True
 
 
-# --- MAIN WINDOW ---
 root = tk.Tk()
 root.title("New Zealand Quiz")
 root.geometry("1000x600")
 root.resizable(False, False)
 
-
-# --- COLORS ---
 NAVY = "#0b0f5c"
 RED = "#e21b23"
 WHITE = "#ffffff"
 GREY = "#d9d9d9"
 
 
-# --- CURRENT CATEGORY ---
+
 selected_category = ""
 
-
-# --- SOUND FUNCTIONS ---
 def play_sound():
    if sound_on:
        try:
@@ -54,14 +47,13 @@ def toggle_sound():
 
 
 
-# --- MAIN CANVAS ---
 canvas = Canvas(root, width=1000, height=600, bg=NAVY, highlightthickness=0)
 canvas.pack(fill="both", expand=True)
 
 
 
 
-# --- BACKGROUND DESIGN ---
+
 def draw_background():
    canvas.delete("all")
 
@@ -88,9 +80,6 @@ def draw_background():
    )
 
 
-
-
-# --- ICON BUTTON CREATOR ---
 def create_icon_button(symbol, command):
    btn = tk.Button(
        root,
@@ -109,17 +98,10 @@ def create_icon_button(symbol, command):
    return btn
 
 
-
-
-# --- HELP FUNCTION ---
 def show_help():
    print("Help clicked")
 
 
-
-
-# ===== CHANGED CODE START =====
-# --- MENU BUTTON CREATOR ---
 def create_menu_button(text, y):
    label = tk.Label(
        root,
@@ -147,15 +129,10 @@ def create_menu_button(text, y):
    label.bind("<Enter>", on_enter)
    label.bind("<Leave>", on_leave)
    label.bind("<Button-1>", on_click)
-# ===== CHANGED CODE END =====
-
 
    canvas.create_window(200, y, window=label)
 
 
-
-
-# --- MAIN MENU PAGE ---
 def show_main_menu():
    draw_background()
 
@@ -171,7 +148,6 @@ def show_main_menu():
        anchor="w"
    )
 
-
    canvas.create_text(
        LEFT_MARGIN, 120,
        text="Test your knowledge on New Zealand’s Birds, Slang, Places and more",
@@ -180,17 +156,11 @@ def show_main_menu():
        anchor="w"
    )
 
-
    create_menu_button("General Knowledge", 220)
    create_menu_button("Native Animals", 270)
    create_menu_button("Places", 320)
    create_menu_button("Slang", 370)
 
-
-
-
-# ===== NEW PAGE CODE START =====
-# --- NAME ENTRY PAGE ---
 def open_name_page(category):
    global selected_category
    selected_category = category
@@ -289,15 +259,9 @@ def open_name_page(category):
    back_button.bind("<Enter>", back_hover)
    back_button.bind("<Leave>", back_leave)
    back_button.bind("<Button-1>", lambda e: show_main_menu())
-# ===== NEW PAGE CODE END =====
-
 
    canvas.create_window(140, 520, window=back_button)
 
-
-
-
-# --- ICON BUTTONS ---
 help_button = create_icon_button("?", show_help)
 sound_button = create_icon_button("🔊", toggle_sound)
 
@@ -320,10 +284,6 @@ canvas.create_window(
    window=sound_button
 )
 
-
-
-
-# --- START PROGRAM ---
 show_main_menu()
 
 
