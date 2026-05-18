@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import Canvas
 import pygame
-
+from PIL import ImageTk
 
 pygame.mixer.init()
 sound_on = True
@@ -16,7 +16,6 @@ NAVY = "#0b0f5c"
 RED = "#e21b23"
 WHITE = "#ffffff"
 GREY = "#d9d9d9"
-
 
 
 selected_category = ""
