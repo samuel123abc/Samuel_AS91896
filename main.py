@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import Canvas
 import pygame
-from PIL import ImageTk
 
 pygame.mixer.init()
 sound_on = True
