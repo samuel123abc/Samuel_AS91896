@@ -172,7 +172,7 @@ def open_name_page(category):
 
    canvas.create_text(
        LEFT_MARGIN, 70,
-       text=f"{category} Quiz",
+       text=f"{category}",
        fill=WHITE,
        font=("Times New Roman", 32, "bold"),
        anchor="w"
