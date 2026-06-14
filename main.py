@@ -1,11 +1,12 @@
 import tkinter as tk
-from tkinter import Canvas, Toplevel, Listbox, SINGLE
+from tkinter import Canvas
 import pygame
 import os
 import random
 
 pygame.mixer.init()
 sound_on = True
+is_paused = False
 
 root = tk.Tk()
 root.title("New Zealand Quiz")
@@ -16,13 +17,14 @@ NAVY = "#0b0f5c"
 RED = "#e21b23"
 WHITE = "#ffffff"
 GREY = "#d9d9d9"
+DARK_NAVY = "#060a3d"
 
 selected_category = ""
 
 MUSIC_FOLDER = "songs"
 
 if not os.path.exists(MUSIC_FOLDER):
-    os.makedirs(MUSIC_FOLDER)
+   os.makedirs(MUSIC_FOLDER)
 
 music_files = [
    file for file in os.listdir(MUSIC_FOLDER)
@@ -32,11 +34,13 @@ music_files = [
 current_song = ""
 
 def play_song(song_name):
-   global current_song, sound_on
+   global current_song, sound_on, is_paused
 
 
    sound_on = True
+   is_paused = False
    sound_button.config(text="🔊")
+   pause_button.config(text="⏸")
 
 
    current_song = song_name.replace(".mp3", "")
@@ -45,7 +49,7 @@ def play_song(song_name):
 
    try:
        pygame.mixer.music.load(song_path)
-       pygame.mixer.music.set_volume(0.35)
+       pygame.mixer.music.set_volume(float(volume_slider.get()))
        pygame.mixer.music.play()
        update_now_playing_text()
    except:
@@ -63,73 +67,139 @@ def play_random_music():
 
 
 def check_music():
-   if not pygame.mixer.music.get_busy() and sound_on:
+   if not pygame.mixer.music.get_busy() and sound_on and not is_paused:
        play_random_music()
    root.after(1000, check_music)
 
 
 
-def open_song_selector():
-   popup = Toplevel(root)
-   popup.title("Select a Track")
-   popup.geometry("300x400")
-   popup.configure(bg=NAVY)
-   popup.resizable(False, False)
+def set_volume(val):
+   pygame.mixer.music.set_volume(float(val))
+
+
+
+
+def toggle_pause():
+   global is_paused
+   if not pygame.mixer.music.get_busy() and not is_paused:
+       return
+
+
+   if is_paused:
+       pygame.mixer.music.unpause()
+       pause_button.config(text="⏸")
+       is_paused = False
+   else:
+       pygame.mixer.music.pause()
+       pause_button.config(text="▶")
+       is_paused = True
+
+
+
+
+hovering_controls = False
+
+
+
+
+def show_audio_controls(e):
+   global hovering_controls
+   hovering_controls = True
+   canvas.create_window(815, 560, window=control_panel, tags="audio_panel_win", anchor="w")
+
+
+
+
+def hide_audio_controls(e):
+   global hovering_controls
+   hovering_controls = False
+   root.after(100, check_hide_panel)
+
+
+
+
+def check_hide_panel():
+   if not hovering_controls:
+       canvas.delete("audio_panel_win")
+
+
+
+
+def open_custom_track_selector():
+   if canvas.find_withtag("custom_popup_win"):
+       return
+
+
+   popup_frame = tk.Frame(root, bg=DARK_NAVY, bd=3, relief="solid", highlightbackground=RED, highlightcolor=RED)
+
 
    tk.Label(
-       popup,
-       text="Available Tracks",
+       popup_frame,
+       text="Select a Track",
        font=("Times New Roman", 14, "bold"),
-       bg=NAVY,
+       bg=DARK_NAVY,
        fg=WHITE
    ).pack(pady=10)
 
-   listbox = Listbox(popup, bg=GREY, fg="black", font=("Arial", 11), selectmode=SINGLE)
-   listbox.pack(fill="both", expand=True, padx=20, pady=10)
+
+   list_frame = tk.Frame(popup_frame, bg=DARK_NAVY)
+   list_frame.pack(fill="both", expand=True, padx=15)
+
+
+   scrollbar = tk.Scrollbar(list_frame)
+   scrollbar.pack(side="right", fill="y")
+
+
+   listbox = tk.Listbox(
+       list_frame, bg=GREY, fg="black", font=("Arial", 10),
+       selectmode="single", yscrollcommand=scrollbar.set, relief="flat", highlightthickness=0
+   )
+   listbox.pack(side="left", fill="both", expand=True)
+   scrollbar.config(command=listbox.yview)
+
 
    for file in music_files:
        listbox.insert("end", file.replace(".mp3", ""))
 
 
-   def on_select():
+   def select_and_close():
        selection = listbox.curselection()
        if selection:
-           index = selection[0]
-           chosen_song = music_files[index]
-           play_song(chosen_song)
-           popup.destroy()
+           play_song(music_files[selection[0]])
+       close_popup()
 
-   tk.Button(
-       popup,
-       text="Play Track",
-       font=("Arial", 11, "bold"),
-       bg=RED,
-       fg=WHITE,
-       command=on_select
-   ).pack(pady=15)
+
+   def close_popup():
+       popup_frame.destroy()
+       canvas.delete("custom_popup_win")
+
+
+   btn_frame = tk.Frame(popup_frame, bg=DARK_NAVY)
+   btn_frame.pack(pady=15)
+
+
+   tk.Button(btn_frame, text="Play", font=("Arial", 10, "bold"), bg=RED, fg=WHITE, width=8,
+             command=select_and_close).pack(side="left", padx=5)
+   tk.Button(btn_frame, text="Cancel", font=("Arial", 10), bg=GREY, fg="black", width=8, command=close_popup).pack(
+       side="left", padx=5)
+
+
+   canvas.create_window(500, 300, window=popup_frame, width=320, height=380, tags="custom_popup_win")
+
+
+
 
 def flash_sound_instruction():
    canvas.delete("sound_btn_win")
 
-   msg_box = tk.Label(
-       root,
-       text="To play music,\npress the sound\nbutton and\nchoose a song",
-       font=("Arial", 9, "bold"),
-       bg=WHITE,
-       fg=NAVY,
-       bd=2,
-       relief="solid",
-       padx=5,
-       pady=5
+
+msg_box = tk.Label(
+       root, text="To play music,\npress the sound\nbutton and\nchoose a song",
+       font=("Arial", 9, "bold"), bg=WHITE, fg=NAVY, bd=2, relief="solid", padx=5, pady=5
    )
 
-   canvas.create_window(
-       1000 - 40,
-       600 - 40,
-       window=msg_box,
-       tags="msg_box_win"
-   )
 
+   canvas.create_window(1000 - 40, 600 - 40, window=msg_box, tags="msg_box_win")
    root.after(4000, lambda: restore_sound_button(msg_box))
 
 
@@ -138,13 +208,9 @@ def flash_sound_instruction():
 def restore_sound_button(msg_box_widget):
    msg_box_widget.destroy()
    canvas.delete("msg_box_win")
+   canvas.create_window(1000 - 40, 600 - 40, window=sound_button, tags="sound_btn_win")
 
-   canvas.create_window(
-       1000 - 40,
-       600 - 40,
-       window=sound_button,
-       tags="sound_btn_win"
-   )
+
 
 def update_now_playing_text():
    if sound_on and current_song:
@@ -176,7 +242,6 @@ def show_help():
 
 def draw_icon_buttons():
    canvas.create_window(1000 - 40, 600 - 40 - 60, window=help_button)
-
    canvas.create_window(1000 - 40, 600 - 40, window=sound_button, tags="sound_btn_win")
 
 
@@ -250,11 +315,36 @@ def open_name_page(category):
    draw_icon_buttons()
 
 help_button = create_icon_button("?", show_help)
-sound_button = create_icon_button("🔊", open_song_selector)
+sound_button = create_icon_button("🔊", open_custom_track_selector)
+
+
+control_panel = tk.Frame(root, bg=NAVY, padx=5)
+
+
+pause_button = tk.Button(
+   control_panel, text="⏸", font=("Segoe UI Emoji", 11),
+   bg=NAVY, fg=WHITE, bd=1, relief="solid", width=3, command=toggle_pause
+)
+pause_button.pack(side="left", padx=2)
+
+
+volume_slider = tk.Scale(
+   control_panel, from_=0.0, to=1.0, resolution=0.05, orient="horizontal",
+   showvalue=False, bg=NAVY, fg=WHITE, highlightthickness=0, troughcolor=GREY,
+   activebackground=RED, length=100, command=set_volume
+)
+volume_slider.set(0.35)
+volume_slider.pack(side="left", padx=5)
+
+
+sound_button.bind("<Enter>", show_audio_controls)
+sound_button.bind("<Leave>", hide_audio_controls)
+control_panel.bind("<Enter>", lambda e: setattr(globals(), 'hovering_controls', True))
+control_panel.bind("<Leave>", hide_audio_controls)
+
 
 check_music()
 show_main_menu()
-
 flash_sound_instruction()
 
 
