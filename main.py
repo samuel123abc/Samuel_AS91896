@@ -97,30 +97,49 @@ def toggle_pause():
 
 
 
-hovering_controls = False
+hover_job = None
 
 
 
 
 def show_audio_controls(e):
-   global hovering_controls
-   hovering_controls = True
-   canvas.create_window(815, 560, window=control_panel, tags="audio_panel_win", anchor="w")
+   global hover_job
+   if hover_job:
+       root.after_cancel(hover_job)
+       hover_job = None
+
+
+   if canvas.find_withtag("pause_win"):
+       return
+
+
+   canvas.create_window(915, 560, window=pause_button, tags="pause_win", anchor="center")
+   canvas.create_window(845, 560, window=volume_slider, tags="slider_win", anchor="center")
 
 
 
 
 def hide_audio_controls(e):
-   global hovering_controls
-   hovering_controls = False
-   root.after(100, check_hide_panel)
+   global hover_job
+   if hover_job:
+       root.after_cancel(hover_job)
+   hover_job = root.after(300, perform_hide)
 
 
 
 
-def check_hide_panel():
-   if not hovering_controls:
-       canvas.delete("audio_panel_win")
+def keep_controls_alive(e):
+   global hover_job
+   if hover_job:
+       root.after_cancel(hover_job)
+       hover_job = None
+
+
+
+
+def perform_hide():
+   canvas.delete("pause_win")
+   canvas.delete("slider_win")
 
 
 
@@ -193,7 +212,7 @@ def flash_sound_instruction():
    canvas.delete("sound_btn_win")
 
 
-msg_box = tk.Label(
+   msg_box = tk.Label(
        root, text="To play music,\npress the sound\nbutton and\nchoose a song",
        font=("Arial", 9, "bold"), bg=WHITE, fg=NAVY, bd=2, relief="solid", padx=5, pady=5
    )
@@ -297,7 +316,7 @@ def open_name_page(category):
    start_button = tk.Label(root, text="Start Quiz", bg=GREY, fg="black", font=("Times New Roman", 18, "italic"),
                            width=15, anchor="center")
    start_button.bind("<Enter>", lambda e: start_button.config(bg=RED, fg=WHITE))
-   start_button.bind("<Leave>", lambda e: start_button.config(bg=GREY, fg="black"))
+   start_button.bind("<Leave>", lambda e: start_button.config(bg=GREY, black="black"))
    start_button.bind("<Button-1>", lambda e: print(f"Starting {category} quiz for {name_entry.get()}"))
    canvas.create_window(220, 330, window=start_button)
 
@@ -318,29 +337,30 @@ help_button = create_icon_button("?", show_help)
 sound_button = create_icon_button("🔊", open_custom_track_selector)
 
 
-control_panel = tk.Frame(root, bg=NAVY, padx=5)
-
-
 pause_button = tk.Button(
-   control_panel, text="⏸", font=("Segoe UI Emoji", 11),
+   root, text="⏸", font=("Segoe UI Emoji", 11),
    bg=NAVY, fg=WHITE, bd=1, relief="solid", width=3, command=toggle_pause
 )
-pause_button.pack(side="left", padx=2)
 
 
 volume_slider = tk.Scale(
-   control_panel, from_=0.0, to=1.0, resolution=0.05, orient="horizontal",
+   root, from_=0.0, to=1.0, resolution=0.05, orient="horizontal",
    showvalue=False, bg=NAVY, fg=WHITE, highlightthickness=0, troughcolor=GREY,
    activebackground=RED, length=100, command=set_volume
 )
 volume_slider.set(0.35)
-volume_slider.pack(side="left", padx=5)
 
 
 sound_button.bind("<Enter>", show_audio_controls)
 sound_button.bind("<Leave>", hide_audio_controls)
-control_panel.bind("<Enter>", lambda e: setattr(globals(), 'hovering_controls', True))
-control_panel.bind("<Leave>", hide_audio_controls)
+
+
+pause_button.bind("<Enter>", keep_controls_alive)
+pause_button.bind("<Leave>", hide_audio_controls)
+
+
+volume_slider.bind("<Enter>", keep_controls_alive)
+volume_slider.bind("<Leave>", hide_audio_controls)
 
 
 check_music()
