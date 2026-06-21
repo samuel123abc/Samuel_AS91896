@@ -21,6 +21,31 @@ DARK_NAVY = "#060a3d"
 
 selected_category = ""
 
+player_name = ""
+current_q_index = 0
+score = 0
+quiz_questions = []
+
+
+GENERAL_KNOWLEDGE_QUESTIONS = [
+   {
+       "question": "What year was television first broadcast\nin New Zealand?",
+       "choices": ["1960", "1961", "1962", "1963"],
+       "answer": "1960"
+   },
+   {
+       "question": "What is the name of the famous New Zealander\non the $100 note?",
+       "choices": ["James Fisher", "Glen O’Conner", "Edmund Hillary", "Ernest Rutherford"],
+       "answer": "Ernest Rutherford"
+   },
+   {
+       "question": "What is the capital of New Zealand?",
+       "choices": ["Auckland", "Christchurch", "Dunedin", "Wellington"],
+       "answer": "Wellington"
+   }
+]
+
+
 MUSIC_FOLDER = "songs"
 
 if not os.path.exists(MUSIC_FOLDER):
@@ -316,8 +341,10 @@ def open_name_page(category):
    start_button = tk.Label(root, text="Start Quiz", bg=GREY, fg="black", font=("Times New Roman", 18, "italic"),
                            width=15, anchor="center")
    start_button.bind("<Enter>", lambda e: start_button.config(bg=RED, fg=WHITE))
-   start_button.bind("<Leave>", lambda e: start_button.config(bg=GREY, black="black"))
-   start_button.bind("<Button-1>", lambda e: print(f"Starting {category} quiz for {name_entry.get()}"))
+   start_button.bind("<Leave>", lambda e: start_button.config(bg=GREY, fg="black"))
+
+
+   start_button.bind("<Button-1>", lambda e: start_quiz(category, name_entry.get()))
    canvas.create_window(220, 330, window=start_button)
 
 
@@ -332,6 +359,73 @@ def open_name_page(category):
    if sound_on:
        update_now_playing_text()
    draw_icon_buttons()
+
+def start_quiz(category, name):
+   global player_name, quiz_questions, current_q_index, score
+   player_name = name.strip()
+   current_q_index = 0
+   score = 0
+   quiz_questions = GENERAL_KNOWLEDGE_QUESTIONS
+   show_question_page()
+
+
+
+
+def show_question_page():
+   draw_background()
+   global current_q_index, score
+   current_q = quiz_questions[current_q_index]
+
+
+   canvas.create_text(60, 80, text=current_q["question"], fill=WHITE, font=("Times New Roman", 24, "bold"),
+                      anchor="nw")
+   canvas.create_rectangle(680, 40, 960, 90, fill=RED, outline="")
+   canvas.create_text(690, 65, text=f"Points: {score}", fill=WHITE, font=("Times New Roman", 22, "bold"), anchor="w")
+   canvas.create_rectangle(500, 150, 920, 430, fill="#050738", outline=GREY, width=1)
+
+
+   start_y = 160
+
+
+   for idx, choice in enumerate(current_q["choices"]):
+       y_pos = start_y + (idx * 65)
+
+
+       bar_id = canvas.create_rectangle(40, y_pos, 380, y_pos + 45, fill=WHITE, outline="")
+
+
+       text_id = canvas.create_text(210, y_pos + 22, text=choice, fill="black", font=("Times New Roman", 18, "italic"),
+                                    anchor="center")
+
+
+       canvas.create_text(420, y_pos + 22, text="★", fill=RED, font=("Arial", 20))
+
+
+       def on_click(e, c=choice): handle_answer(c)
+
+
+       canvas.tag_bind(bar_id, "<Button-1>", on_click)
+       canvas.tag_bind(text_id, "<Button-1>", on_click)
+
+
+   if sound_on: update_now_playing_text()
+   draw_icon_buttons()
+
+
+
+
+def handle_answer(selected_choice):
+   global current_q_index, score
+   if selected_choice == quiz_questions[current_q_index]["answer"]:
+       score += 10
+   current_q_index += 1
+   if current_q_index < len(quiz_questions):
+       show_question_page()
+   else:
+       show_main_menu()
+
+
+
 
 help_button = create_icon_button("?", show_help)
 sound_button = create_icon_button("🔊", open_custom_track_selector)
