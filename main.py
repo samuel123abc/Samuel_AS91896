@@ -377,28 +377,25 @@ def show_question_page():
    current_q = quiz_questions[current_q_index]
 
 
-   canvas.create_text(60, 80, text=current_q["question"], fill=WHITE, font=("Times New Roman", 24, "bold"),
+   canvas.create_text(60, 45, text=current_q["question"], fill=WHITE, font=("Times New Roman", 24, "bold"),
                       anchor="nw")
    canvas.create_rectangle(680, 40, 960, 90, fill=RED, outline="")
    canvas.create_text(690, 65, text=f"Points: {score}", fill=WHITE, font=("Times New Roman", 22, "bold"), anchor="w")
    canvas.create_rectangle(500, 150, 920, 430, fill="#050738", outline=GREY, width=1)
 
 
-   start_y = 160
+   start_y = 195
 
 
    for idx, choice in enumerate(current_q["choices"]):
        y_pos = start_y + (idx * 65)
 
 
-       bar_id = canvas.create_rectangle(40, y_pos, 380, y_pos + 45, fill=WHITE, outline="")
+       bar_id = canvas.create_rectangle(80, y_pos, 420, y_pos + 45, fill=WHITE, outline="")
 
 
-       text_id = canvas.create_text(210, y_pos + 22, text=choice, fill="black", font=("Times New Roman", 18, "italic"),
+       text_id = canvas.create_text(250, y_pos + 22, text=choice, fill="black", font=("Times New Roman", 18, "italic"),
                                     anchor="center")
-
-
-       canvas.create_text(420, y_pos + 22, text="★", fill=RED, font=("Arial", 20))
 
 
        def on_click(e, c=choice): handle_answer(c)
