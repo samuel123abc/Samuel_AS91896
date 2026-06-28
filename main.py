@@ -379,9 +379,14 @@ def show_question_page():
 
    canvas.create_text(60, 45, text=current_q["question"], fill=WHITE, font=("Times New Roman", 24, "bold"),
                       anchor="nw")
-   canvas.create_rectangle(680, 40, 960, 90, fill=RED, outline="")
-   canvas.create_text(690, 65, text=f"Points: {score}", fill=WHITE, font=("Times New Roman", 22, "bold"), anchor="w")
+
+
    canvas.create_rectangle(500, 150, 920, 430, fill="#050738", outline=GREY, width=1)
+
+
+   canvas.create_rectangle(500, 450, 920, 500, fill=RED, outline="")
+   canvas.create_text(710, 475, text=f"Points: {score}", fill=WHITE, font=("Times New Roman", 22, "bold"),
+                      anchor="center")
 
 
    start_y = 195
@@ -392,8 +397,6 @@ def show_question_page():
 
 
        bar_id = canvas.create_rectangle(80, y_pos, 420, y_pos + 45, fill=WHITE, outline="")
-
-
        text_id = canvas.create_text(250, y_pos + 22, text=choice, fill="black", font=("Times New Roman", 18, "italic"),
                                     anchor="center")
 
