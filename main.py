@@ -284,7 +284,12 @@ def create_icon_button(symbol, command):
 def show_help():
    print("Help clicked")
 
-def draw_icon_buttons():
+
+
+
+def draw_icon_buttons(include_home=True):
+   if include_home:
+       canvas.create_window(1000 - 40, 600 - 40 - 120, window=home_button)
    canvas.create_window(1000 - 40, 600 - 40 - 60, window=help_button)
    canvas.create_window(1000 - 40, 600 - 40, window=sound_button, tags="sound_btn_win")
 
@@ -318,7 +323,9 @@ def show_main_menu():
 
    if sound_on:
        update_now_playing_text()
-   draw_icon_buttons()
+
+
+   draw_icon_buttons(include_home=False)
 
 
 
@@ -365,8 +372,13 @@ def start_quiz(category, name):
    player_name = name.strip()
    current_q_index = 0
    score = 0
-   quiz_questions = GENERAL_KNOWLEDGE_QUESTIONS
-   show_question_page()
+
+
+   if category == "General Knowledge":
+       quiz_questions = GENERAL_KNOWLEDGE_QUESTIONS
+       show_question_page()
+   else:
+       show_main_menu()
 
 
 
@@ -427,6 +439,7 @@ def handle_answer(selected_choice):
 
 
 
+home_button = create_icon_button("🏠", show_main_menu)
 help_button = create_icon_button("?", show_help)
 sound_button = create_icon_button("🔊", open_custom_track_selector)
 
