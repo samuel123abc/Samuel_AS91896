@@ -42,7 +42,42 @@ GENERAL_KNOWLEDGE_QUESTIONS = [
        "question": "What is the capital of New Zealand?",
        "choices": ["Auckland", "Christchurch", "Dunedin", "Wellington"],
        "answer": "Wellington"
-   }
+   },
+   {
+       "question": "Who is New Zealand's Current Monarch?",
+       "choices": ["King Edward", "King Charles", "Queen Elizabeth", "King Charlie"],
+       "answer": "King Charles"
+   },
+   {
+       "question": "Complete the Title of this popular New Zealand \nsong by Kiwi Musician Dave Dobbyn?: Slice of ________",
+       "choices": ["Cheese", "Life", "Heaven", "You"],
+       "answer": "Heaven"
+   },
+   {
+       "question": "What is the Longest Running Soap Opera in New Zealand?",
+       "choices": ["Country Calendar", "Shortland Street", "Emmerdale", "Coronation Street"],
+       "answer": "Heaven"
+   },
+   {
+       "question": "What is the Name of the Traditional New Zealand Maori \nMethod of Cooking Food Using Heated Rocks Buried Underground?",
+       "choices": ["Rock Oven", "Maori Oven", "Kupu", "Hangi"],
+       "answer": "Hangi"
+   },
+   {
+       "question": "What Desert do Australians and New Zealanders both Claim as their Own?",
+       "choices": ["Pavlova", "Lamington", "Fairy Bread", "Chocolate Cake"],
+       "answer": "Pavlova"
+   },
+   {
+       "question": "What is the Name of the National Rugby Team of New Zealand?",
+       "choices": ["The Kiwi's", "The Blackies", "The All Blacks", "The All Whites"],
+       "answer": "The All Blacks"
+   },
+   {
+       "question": "Which Sport was Richard Hadlee Known for Playing?",
+       "choices": ["Cricket", "Rugby", "Golf", "Lawn Bowls"],
+       "answer": "Cricket"
+   },
 ]
 
 
