@@ -448,11 +448,27 @@ def show_question_page():
                                     anchor="center")
 
 
+       def on_enter(e, b=bar_id, t=text_id):
+           canvas.itemconfig(b, fill=RED)
+           canvas.itemconfig(t, fill=WHITE)
+
+
+       def on_leave(e, b=bar_id, t=text_id):
+           canvas.itemconfig(b, fill=WHITE)
+           canvas.itemconfig(t, fill="black")
+
+
        def on_click(e, c=choice): handle_answer(c)
 
 
        canvas.tag_bind(bar_id, "<Button-1>", on_click)
        canvas.tag_bind(text_id, "<Button-1>", on_click)
+
+
+       canvas.tag_bind(bar_id, "<Enter>", on_enter)
+       canvas.tag_bind(text_id, "<Enter>", on_enter)
+       canvas.tag_bind(bar_id, "<Leave>", on_leave)
+       canvas.tag_bind(text_id, "<Leave>", on_leave)
 
 
    if sound_on: update_now_playing_text()
