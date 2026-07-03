@@ -3,6 +3,7 @@ from tkinter import Canvas
 import pygame
 import os
 import random
+from PIL import Image, ImageTk
 
 pygame.mixer.init()
 sound_on = True
@@ -27,56 +28,69 @@ score = 0
 quiz_questions = []
 
 
+current_image_ref = None
+
+
 GENERAL_KNOWLEDGE_QUESTIONS = [
    {
        "question": "What year was television first broadcast\nin New Zealand?",
        "choices": ["1960", "1961", "1962", "1963"],
-       "answer": "1960"
+       "answer": "1960",
+       "image": "images/q1gk.jpg"
    },
    {
        "question": "What is the name of the famous New Zealander\non the $100 note?",
        "choices": ["James Fisher", "Glen O’Conner", "Edmund Hillary", "Ernest Rutherford"],
-       "answer": "Ernest Rutherford"
+       "answer": "Ernest Rutherford",
+       "image": "images/q2gk.jpg"
    },
    {
        "question": "What is the capital of New Zealand?",
        "choices": ["Auckland", "Christchurch", "Dunedin", "Wellington"],
-       "answer": "Wellington"
+       "answer": "Wellington",
+       "image": "images/q3gk.jpeg"
    },
    {
        "question": "Who is New Zealand's Current Monarch?",
        "choices": ["King Edward", "King Charles", "Queen Elizabeth", "King Charlie"],
-       "answer": "King Charles"
+       "answer": "King Charles",
+       "image": "images/q4gk.jpeg"
    },
    {
        "question": "Complete the Title of this popular New Zealand \nsong by Kiwi Musician Dave Dobbyn?: Slice of ________",
        "choices": ["Cheese", "Life", "Heaven", "You"],
-       "answer": "Heaven"
+       "answer": "Heaven",
+       "image": "images/q5gk.jpeg"
    },
    {
        "question": "What is the Longest Running Soap Opera in New Zealand?",
        "choices": ["Country Calendar", "Shortland Street", "Emmerdale", "Coronation Street"],
-       "answer": "Heaven"
+       "answer": "Shortland Street",
+       "image": "images/q6gk.jpeg"
    },
    {
        "question": "What is the Name of the Traditional New Zealand Maori \nMethod of Cooking Food Using Heated Rocks Buried Underground?",
        "choices": ["Rock Oven", "Maori Oven", "Kupu", "Hangi"],
-       "answer": "Hangi"
+       "answer": "Hangi",
+       "image": "images/q7gk.jpeg"
    },
    {
        "question": "What Desert do Australians and New Zealanders both Claim as their Own?",
        "choices": ["Pavlova", "Lamington", "Fairy Bread", "Chocolate Cake"],
-       "answer": "Pavlova"
+       "answer": "Pavlova",
+       "image": "images/q8gk.jpeg"
    },
    {
        "question": "What is the Name of the National Rugby Team of New Zealand?",
        "choices": ["The Kiwi's", "The Blackies", "The All Blacks", "The All Whites"],
-       "answer": "The All Blacks"
+       "answer": "The All Blacks",
+       "image": "images/q9gk.jpeg"
    },
    {
        "question": "Which Sport was Richard Hadlee Known for Playing?",
        "choices": ["Cricket", "Rugby", "Golf", "Lawn Bowls"],
-       "answer": "Cricket"
+       "answer": "Cricket",
+       "image": "images/q10gk.jpeg"
    },
 ]
 
@@ -420,7 +434,7 @@ def start_quiz(category, name):
 
 def show_question_page():
    draw_background()
-   global current_q_index, score
+   global current_q_index, score, current_image_ref
    current_q = quiz_questions[current_q_index]
 
 
@@ -429,6 +443,16 @@ def show_question_page():
 
 
    canvas.create_rectangle(500, 150, 920, 430, fill="#050738", outline=GREY, width=1)
+
+
+   try:
+       opened_img = Image.open(current_q["image"])
+       resized_img = opened_img.resize((400, 260))
+       current_image_ref = ImageTk.PhotoImage(resized_img)
+       canvas.create_image(710, 290, image=current_image_ref, anchor="center")
+   except Exception as e:
+       canvas.create_text(710, 290, text=f"[{current_q['image']}\nnot found]", fill=WHITE,
+                          font=("Times New Roman", 16, "italic"), anchor="center")
 
 
    canvas.create_rectangle(500, 450, 920, 500, fill=RED, outline="")
