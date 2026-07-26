@@ -253,7 +253,7 @@ SLANG_QUESTIONS = [
       "question": "What does 'Buggered' Mean",
       "choices": ["Sore", "Tired", "Happy", "Sad"],
       "answer": "Tired",
-      "image": "images/q1s.jpg"
+      "image": "images/q1s.webp"
   },
   {
       "question": "What is a 'Chilly Bin'",
@@ -265,7 +265,7 @@ SLANG_QUESTIONS = [
       "question": "What does 'The Wops' mean",
       "choices": ["Chopping Up Fruit Quickly", "Middle of Nowhere", "Cheering Loudly", "A Stupid Person"],
       "answer": "An ice box / Cooler",
-      "image": "images/q3s.jpg"
+      "image": "images/q3s.jpeg"
   },
   {
       "question": "What does 'Chocka Block' mean?",
@@ -283,13 +283,13 @@ SLANG_QUESTIONS = [
       "question": "What is a 'Bogan'",
       "choices": ["An Uncultured Person", "Snot", "A Fat Person", "A Bald Person"],
       "answer": "An Uncultured Person",
-      "image": "images/q6s.jpg"
+      "image": "images/q6s.jpeg"
   },
   {
       "question": "What Does 'Yarn' mean",
       "choices": ["Roll Down a Hill", "A Friendly Chat", "Something Soft", "Wool"],
       "answer": "A Friendly Chat",
-      "image": "images/q7s.jpg"
+      "image": "images/q7s.jpeg"
   },
   {
       "question": "What is a 'Dunny'?",
@@ -301,13 +301,13 @@ SLANG_QUESTIONS = [
       "question": "What Does 'Cark It' Mean?",
       "choices": ["Die", "Get Fired", "Move Country", "Stop Talking"],
       "answer": "Die",
-      "image": "images/q9s.jpg"
+      "image": "images/q9s.png"
   },
   {
       "question": "What Does it Mean for Someone to 'Have a Blue'",
       "choices": ["Have a Bad Day", "Get Painted Blue", "Have an Argument", "Have a Swim"],
       "answer": "Have an Argument",
-      "image": "images/q10s.jpg"
+      "image": "images/q10s.png"
   }
 ]
 
