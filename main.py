@@ -1,32 +1,35 @@
 import tkinter as tk
-from tkinter import Canvas
+from tkinter import Canvas, messagebox
 import pygame
 import os
 import random
 from PIL import Image, ImageTk
 
 
+# initialize pygame mixer for sound
 pygame.mixer.init()
 sound_on = True
 is_paused = False
 
 
+# main window setup
 root = tk.Tk()
 root.title("New Zealand Quiz")
 root.geometry("1000x600")
-root.resizable(False, False)
+root.resizable(True, True)
 
 
+# main color scheme
 NAVY = "#0b0f5c"
 RED = "#e21b23"
+GREEN = "#00a651"
 WHITE = "#ffffff"
 GREY = "#d9d9d9"
 DARK_NAVY = "#060a3d"
 
 
+# variables to keep track of game state
 selected_category = ""
-
-
 player_name = ""
 current_q_index = 0
 score = 0
@@ -34,14 +37,67 @@ quiz_questions = []
 
 
 current_image_ref = None
+current_screen = "main_menu"
 
 
+# dictionary storing help text for each screen
+HELP_TEXT = {
+   "main_menu": {
+       "title": "Main Menu - Help",
+       "content": (
+           "Welcome to the New Zealand Quiz!\n\n"
+           "• Click on any category button on the left to start a quiz.\n"
+           "• Use the sound icon in the bottom right to select background songs or adjust volume."
+       )
+   },
+   "name_page": {
+       "title": "Name Entry - Help",
+       "content": (
+           "Before starting the quiz:\n\n"
+           "• Enter your name into the text box.\n"
+           "• Names must contain only letters and spaces.\n"
+           "• Numbers and special characters are not allowed.\n"
+           "• Click 'Start Quiz' to proceed or '← Back' to pick another category."
+       )
+   },
+   "question_page": {
+       "title": "Quiz - Help",
+       "content": (
+           "How to play:\n\n"
+           "• Read the question. Some questions require you to examine the image\n"
+           "• Click one of the 4 answer choices on the left to submit your answer.\n"
+           "• Each correct answer earns you 10 points.\n"
+           "• Your current score and question number are shown in the red banner."
+       )
+   },
+   "pass_screen": {
+       "title": "Passed Quiz - Help",
+       "content": (
+           "Congratulations on passing!\n\n"
+           "• You scored over 50 points!\n"
+           "• Click 'Play Category Again' to retry this category.\n"
+           "• Click 'Go To Home Screen' to return to the main menu and try another quiz."
+       )
+   },
+   "fail_screen": {
+       "title": "Failed Quiz - Help",
+       "content": (
+           "Unfortunate result!\n\n"
+           "• You scored 50 points or fewer.\n"
+           "• Click 'Try Again' to retry this category and improve your score.\n"
+           "• Click 'Go Back Home' to select a different category."
+       )
+   }
+}
+
+
+# quiz questions for general knowledge
 GENERAL_KNOWLEDGE_QUESTIONS = [
    {
        "question": "What year was television first broadcast\nin New Zealand?",
        "choices": ["1960", "1961", "1962", "1963"],
        "answer": "1960",
-       "image": "images/q1gk.jpeg"
+       "image": "images/q1gk.jpg"
    },
    {
        "question": "What is the name of the famous New Zealander\non the $100 note?",
@@ -100,6 +156,7 @@ GENERAL_KNOWLEDGE_QUESTIONS = [
 ]
 
 
+# quiz questions for native animals
 NATIVE_ANIMALS_QUESTIONS = [
    {
        "question": "Which Native Animal is This?",
@@ -164,6 +221,7 @@ NATIVE_ANIMALS_QUESTIONS = [
 ]
 
 
+# quiz questions for famous places
 PLACES_QUESTIONS = [
    {
        "question": "Which Place is Famous for the Big L&P Bottle",
@@ -198,7 +256,7 @@ PLACES_QUESTIONS = [
    {
        "question": "What Part of New Zealand is Known as the\n'Adventure Capital of the World'",
        "choices": ["New Plymouth", "Gisborne", "Queenstown", "Rotorua"],
-       "answer": "Wellington",
+       "answer": "Queenstown",
        "image": "images/q6p.png"
    },
    {
@@ -228,6 +286,7 @@ PLACES_QUESTIONS = [
 ]
 
 
+# quiz questions for nz slang
 SLANG_QUESTIONS = [
    {
        "question": "What does 'Buggered' Mean",
@@ -237,15 +296,15 @@ SLANG_QUESTIONS = [
    },
    {
        "question": "What is a 'Chilly Bin'",
-       "choices": ["A Rubbish Bin to Keep Your Rubbish Cold", "A Cold Morning", "A Cold Night",
-                   "A Cooler Box Used for Keeping Drinks Cold"],
+       "choices": ["Bin to Keep Rubbish Cold", "A Cold Morning", "A Cold Night",
+                   "Box for keeping drinks cold"],
        "answer": "A Cooler Box Used for Keeping Drinks Cold",
        "image": "images/q2s.jpg"
    },
    {
        "question": "What does 'The Wops' mean",
        "choices": ["Chopping Up Fruit Quickly", "Middle of Nowhere", "Cheering Loudly", "A Stupid Person"],
-       "answer": "An ice box / Cooler",
+       "answer": "Middle of Nowhere",
        "image": "images/q3s.jpeg"
    },
    {
@@ -293,6 +352,7 @@ SLANG_QUESTIONS = [
 ]
 
 
+# check if songs folder exists, create it if missing, and load files
 MUSIC_FOLDER = "songs"
 
 
@@ -311,6 +371,7 @@ current_song = ""
 
 
 
+# play a specific track and set button states
 def play_song(song_name):
    global current_song, sound_on, is_paused
 
@@ -336,6 +397,7 @@ def play_song(song_name):
 
 
 
+# pick a random track from the folder to play
 def play_random_music():
    if not music_files or not sound_on:
        return
@@ -345,6 +407,7 @@ def play_random_music():
 
 
 
+# keep checking if music stopped so the next track plays automatically
 def check_music():
    if not pygame.mixer.music.get_busy() and sound_on and not is_paused:
        play_random_music()
@@ -353,12 +416,14 @@ def check_music():
 
 
 
+# adjust volume
 def set_volume(val):
    pygame.mixer.music.set_volume(float(val))
 
 
 
 
+# pause or resume background music
 def toggle_pause():
    global is_paused
    if not pygame.mixer.music.get_busy() and not is_paused:
@@ -382,6 +447,7 @@ hover_job = None
 
 
 
+# display pause button and volume slider on mouse hover
 def show_audio_controls(e):
    global hover_job
    if hover_job:
@@ -399,6 +465,7 @@ def show_audio_controls(e):
 
 
 
+# hide audio controls after a short delay
 def hide_audio_controls(e):
    global hover_job
    if hover_job:
@@ -408,6 +475,7 @@ def hide_audio_controls(e):
 
 
 
+# stop controls from hiding if mouse stays over them
 def keep_controls_alive(e):
    global hover_job
    if hover_job:
@@ -417,6 +485,7 @@ def keep_controls_alive(e):
 
 
 
+# remove sound control widgets from the canvas
 def perform_hide():
    canvas.delete("pause_win")
    canvas.delete("slider_win")
@@ -424,6 +493,7 @@ def perform_hide():
 
 
 
+# popup window to pick a song from the list
 def open_custom_track_selector():
    if canvas.find_withtag("custom_popup_win"):
        return
@@ -488,6 +558,7 @@ def open_custom_track_selector():
 
 
 
+# show a temporary popup message telling users how to play music
 def flash_sound_instruction():
    canvas.delete("sound_btn_win")
 
@@ -504,6 +575,7 @@ def flash_sound_instruction():
 
 
 
+# bring back the sound button after instruction prompt closes
 def restore_sound_button(msg_box_widget):
    msg_box_widget.destroy()
    canvas.delete("msg_box_win")
@@ -512,6 +584,7 @@ def restore_sound_button(msg_box_widget):
 
 
 
+# update current song title label on screen
 def update_now_playing_text():
    if sound_on and current_song:
        canvas.itemconfig("now_playing", text=f"Now Playing: {current_song}")
@@ -519,12 +592,14 @@ def update_now_playing_text():
 
 
 
+# create main canvas for graphics
 canvas = Canvas(root, width=1000, height=600, bg=NAVY, highlightthickness=0)
 canvas.pack(fill="both", expand=True)
 
 
 
 
+# clear and draw common background shapes
 def draw_background():
    canvas.delete("all")
    canvas.create_text(
@@ -536,6 +611,7 @@ def draw_background():
 
 
 
+# helper function to build small square icon buttons
 def create_icon_button(symbol, command):
    return tk.Button(
        root, text=symbol, font=("Segoe UI Emoji", 16), bg=NAVY, fg=WHITE,
@@ -546,12 +622,67 @@ def create_icon_button(symbol, command):
 
 
 
+# display help popup based on active screen
 def show_help():
-   print("Help clicked")
+   if canvas.find_withtag("help_popup_win"):
+       return
+
+
+   info = HELP_TEXT.get(current_screen, {
+       "title": "Help",
+       "content": "No instructions available for this page."
+   })
+
+
+   popup_frame = tk.Frame(root, bg=DARK_NAVY, bd=3, relief="solid", highlightbackground=RED, highlightcolor=RED)
+
+
+   tk.Label(
+       popup_frame,
+       text=info["title"],
+       font=("Times New Roman", 18, "bold"),
+       bg=DARK_NAVY,
+       fg=WHITE
+   ).pack(pady=(15, 10))
+
+
+   tk.Label(
+       popup_frame,
+       text=info["content"],
+       font=("Arial", 11),
+       bg=DARK_NAVY,
+       fg=WHITE,
+       justify="left",
+       wraplength=400
+   ).pack(pady=10, padx=20, fill="both", expand=True)
+
+
+   def close_popup():
+       popup_frame.destroy()
+       canvas.delete("help_popup_win")
+
+
+   btn_frame = tk.Frame(popup_frame, bg=DARK_NAVY)
+   btn_frame.pack(pady=(5, 15))
+
+
+   tk.Button(
+       btn_frame,
+       text="Close",
+       font=("Arial", 10, "bold"),
+       bg=RED,
+       fg=WHITE,
+       width=10,
+       command=close_popup
+   ).pack()
+
+
+   canvas.create_window(500, 300, window=popup_frame, width=460, height=320, tags="help_popup_win")
 
 
 
 
+# draw bottom-right corner buttons
 def draw_icon_buttons(include_home=True):
    if include_home:
        canvas.create_window(1000 - 40, 600 - 40 - 120, window=home_button)
@@ -561,6 +692,7 @@ def draw_icon_buttons(include_home=True):
 
 
 
+# create category buttons for main menu with hover colors
 def create_menu_button(text, y):
    label = tk.Label(root, text=text, bg=GREY, fg="black", font=("Times New Roman", 18, "italic"), width=18,
                     anchor="center")
@@ -572,7 +704,12 @@ def create_menu_button(text, y):
 
 
 
+# build and show main menu page
 def show_main_menu():
+   global current_screen
+   current_screen = "main_menu"
+
+
    draw_background()
    canvas.create_text(80, 70, text="Welcome to the New Zealand Quiz", fill=WHITE, font=("Times New Roman", 32, "bold"),
                       anchor="w")
@@ -595,9 +732,13 @@ def show_main_menu():
 
 
 
+# build and show name entry page
 def open_name_page(category):
-   global selected_category
+   global selected_category, current_screen
    selected_category = category
+   current_screen = "name_page"
+
+
    draw_background()
 
 
@@ -635,9 +776,28 @@ def open_name_page(category):
 
 
 
+# validate input name and start chosen quiz category
 def start_quiz(category, name):
-   global player_name, quiz_questions, current_q_index, score
-   player_name = name.strip()
+   global player_name, quiz_questions, current_q_index, score, selected_category
+
+
+   clean_name = name.strip()
+
+
+   # check for empty input
+   if not clean_name:
+       messagebox.showwarning("Name Required", "Please enter your name to begin the quiz.")
+       return
+
+
+   # check that name only contains letters and spaces
+   if not clean_name.replace(" ", "").isalpha():
+       messagebox.showwarning("Invalid Name", "Your name cannot contain numbers or special characters.")
+       return
+
+
+   selected_category = category
+   player_name = clean_name
    current_q_index = 0
    score = 0
 
@@ -660,9 +820,13 @@ def start_quiz(category, name):
 
 
 
+# render question, image, and options for the current question
 def show_question_page():
+   global current_q_index, score, current_image_ref, current_screen
+   current_screen = "question_page"
+
+
    draw_background()
-   global current_q_index, score, current_image_ref
    current_q = quiz_questions[current_q_index]
 
 
@@ -741,6 +905,7 @@ def show_question_page():
 
 
 
+# check clicked answer, update score, and load next question or end screen
 def handle_answer(selected_choice):
    global current_q_index, score
    if selected_choice == quiz_questions[current_q_index]["answer"]:
@@ -749,11 +914,118 @@ def handle_answer(selected_choice):
    if current_q_index < len(quiz_questions):
        show_question_page()
    else:
-       show_main_menu()
+       show_completion_page()
 
 
 
 
+# display final results screen based on pass or fail mark
+def show_completion_page():
+   global current_screen
+   canvas.delete("all")
+
+
+   passed = score > 50
+   current_screen = "pass_screen" if passed else "fail_screen"
+
+
+   banner_color = GREEN if passed else RED
+   header_text = "Good Stuff!" if passed else "Sorry, You Failed"
+
+
+   display_name = player_name if player_name else "Player"
+
+
+   prefix = f"Well Done {display_name}" if passed else f"Sorry {display_name}"
+   status_text = "PASSED" if passed else "FAILED"
+   sub_text = f"{prefix}, You {status_text} the {selected_category} Category. You Got {score} Points"
+
+
+   canvas.create_rectangle(0, 0, 1000, 600, fill=NAVY, outline="")
+
+
+   canvas.create_text(
+       20, 575, text="", fill=WHITE, font=("Arial", 10), anchor="w", tags="now_playing"
+   )
+
+
+   canvas.create_rectangle(-10, 20, 1010, 25, fill=WHITE, outline="")
+   canvas.create_rectangle(-10, 25, 1010, 125, fill=banner_color, outline="")
+   canvas.create_rectangle(-10, 125, 1010, 130, fill=WHITE, outline="")
+   canvas.create_rectangle(-10, 130, 1010, 190, fill=banner_color, outline="")
+   canvas.create_rectangle(-10, 190, 1010, 195, fill=WHITE, outline="")
+
+
+   canvas.create_text(500, 75, text=header_text, fill=WHITE, font=("Times New Roman", 38, "bold"), anchor="center")
+   canvas.create_text(500, 160, text=sub_text, fill=WHITE, font=("Times New Roman", 19, "bold"), anchor="center")
+
+
+   if passed:
+       btn1_text = "Go To Home Screen"
+       btn1_cmd = show_main_menu
+       btn2_text = "Play Category Again"
+       btn2_cmd = lambda: start_quiz(selected_category, player_name)
+   else:
+       btn1_text = "Try Again"
+       btn1_cmd = lambda: start_quiz(selected_category, player_name)
+       btn2_text = "Go Back Home"
+       btn2_cmd = show_main_menu
+
+
+   b1_rect = canvas.create_rectangle(210, 265, 790, 315, fill=WHITE, outline="")
+   b1_txt = canvas.create_text(500, 290, text=btn1_text, fill="black", font=("Times New Roman", 22, "italic"), anchor="center")
+
+
+   b2_rect = canvas.create_rectangle(210, 360, 790, 410, fill=WHITE, outline="")
+   b2_txt = canvas.create_text(500, 385, text=btn2_text, fill="black", font=("Times New Roman", 22, "italic"), anchor="center")
+
+
+   def on_enter_1(e):
+       canvas.itemconfig(b1_rect, fill=RED)
+       canvas.itemconfig(b1_txt, fill=WHITE)
+
+
+   def on_leave_1(e):
+       canvas.itemconfig(b1_rect, fill=WHITE)
+       canvas.itemconfig(b1_txt, fill="black")
+
+
+   def on_enter_2(e):
+       canvas.itemconfig(b2_rect, fill=RED)
+       canvas.itemconfig(b2_txt, fill=WHITE)
+
+
+   def on_leave_2(e):
+       canvas.itemconfig(b2_rect, fill=WHITE)
+       canvas.itemconfig(b2_txt, fill="black")
+
+
+   canvas.tag_bind(b1_rect, "<Button-1>", lambda e: btn1_cmd())
+   canvas.tag_bind(b1_txt, "<Button-1>", lambda e: btn1_cmd())
+   canvas.tag_bind(b1_rect, "<Enter>", on_enter_1)
+   canvas.tag_bind(b1_rect, "<Leave>", on_leave_1)
+   canvas.tag_bind(b1_txt, "<Enter>", on_enter_1)
+   canvas.tag_bind(b1_txt, "<Leave>", on_leave_1)
+
+
+   canvas.tag_bind(b2_rect, "<Button-1>", lambda e: btn2_cmd())
+   canvas.tag_bind(b2_txt, "<Button-1>", lambda e: btn2_cmd())
+   canvas.tag_bind(b2_rect, "<Enter>", on_enter_2)
+   canvas.tag_bind(b2_rect, "<Leave>", on_leave_2)
+   canvas.tag_bind(b2_txt, "<Enter>", on_enter_2)
+   canvas.tag_bind(b2_txt, "<Leave>", on_leave_2)
+
+
+   if sound_on:
+       update_now_playing_text()
+
+
+   draw_icon_buttons(include_home=False)
+
+
+
+
+# set up quick action buttons in lower corner
 home_button = create_icon_button("🏠", show_main_menu)
 help_button = create_icon_button("?", show_help)
 sound_button = create_icon_button("🔊", open_custom_track_selector)
@@ -773,6 +1045,7 @@ volume_slider = tk.Scale(
 volume_slider.set(0.35)
 
 
+# mouse event bindings for audio controls
 sound_button.bind("<Enter>", show_audio_controls)
 sound_button.bind("<Leave>", hide_audio_controls)
 
@@ -785,6 +1058,7 @@ volume_slider.bind("<Enter>", keep_controls_alive)
 volume_slider.bind("<Leave>", hide_audio_controls)
 
 
+# start checking music, load home screen, and run app loop
 check_music()
 show_main_menu()
 flash_sound_instruction()
